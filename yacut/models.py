@@ -30,13 +30,3 @@ class URLMap(db.Model):
             url=self.original,
             short_link=url_for('link_view', short=self.short, _external=True),
         )
-
-    def from_dict(self, data):
-        to_model_field = {
-            'url': 'original',
-            'custom_id': 'short'
-        }
-
-        for field, model_field in to_model_field.items():
-            if field in data:
-                setattr(self, model_field, data[field])

@@ -8,7 +8,7 @@ from .error_handlers import InvalidAPIUsage
 from .models import URLMap
 
 
-@app.route('/api/id/<short>', methods=['GET'])
+@app.route('/api/id/<path:short>/', methods=['GET'])
 def get_link(short):
     urlmap = URLMap.query.filter_by(short=short).first()
     if urlmap is None:
