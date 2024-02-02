@@ -40,4 +40,3 @@ class URLMap(db.Model):
         for field, model_field in to_model_field.items():
             if field in data:
                 setattr(self, model_field, data[field])
-
