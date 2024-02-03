@@ -1,4 +1,5 @@
 import re
+from http import HTTPStatus
 
 from flask import jsonify, request
 
@@ -12,18 +13,20 @@ from .models import URLMap
 def get_link(short):
     urlmap = URLMap.query.filter_by(short=short).first()
     if urlmap is None:
-        raise InvalidAPIUsage('Указанный id не найден', 404)
-    return jsonify({'url': urlmap.original}), 200
+        raise InvalidAPIUsage('Указанный id не найден', HTTPStatus.NOT_FOUND)
+    return jsonify({'url': urlmap.original}), HTTPStatus.OK
 
 
 @app.route('/api/id/', methods=['POST'])
 def add_opinion():
     data = request.get_json()
     if not data:
-        raise InvalidAPIUsage('Отсутствует тело запроса', 400)
+        raise InvalidAPIUsage('Отсутствует тело запроса',
+                              HTTPStatus.BAD_REQUEST)
 
     if 'url' not in data:
-        raise InvalidAPIUsage('"url" является обязательным полем!', 400)
+        raise InvalidAPIUsage('"url" является обязательным полем!',
+                              HTTPStatus.BAD_REQUEST)
 
     custom_id = data.get('custom_id')
     if custom_id:
@@ -31,13 +34,13 @@ def add_opinion():
                 or re.match(CUSTOM_ID_REGEX, custom_id) is None):
             raise InvalidAPIUsage(
                 'Указано недопустимое имя для короткой ссылки',
-                400
+                HTTPStatus.BAD_REQUEST
             )
 
         if URLMap.query.filter_by(short=custom_id).first() is not None:
             raise InvalidAPIUsage(
                 'Предложенный вариант короткой ссылки уже существует.',
-                400
+                HTTPStatus.BAD_REQUEST
             )
     urlmap = URLMap(
         original=data['url'],
@@ -46,4 +49,4 @@ def add_opinion():
 
     db.session.add(urlmap)
     db.session.commit()
-    return jsonify(urlmap.to_dict()), 201
+    return jsonify(urlmap.to_dict()), HTTPStatus.CREATED
