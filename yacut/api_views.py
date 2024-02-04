@@ -4,7 +4,7 @@ from http import HTTPStatus
 from flask import jsonify, request
 
 from . import app, db
-from .constants import CUSTOM_ID_REGEX
+from .constants import CUSTOM_ID_REGEX, MAX_CUSTOM_ID_LENGTH
 from .error_handlers import InvalidAPIUsage
 from .models import URLMap
 
@@ -30,7 +30,7 @@ def add_opinion():
 
     custom_id = data.get('custom_id')
     if custom_id:
-        if (len(custom_id) > 16
+        if (len(custom_id) > MAX_CUSTOM_ID_LENGTH
                 or re.match(CUSTOM_ID_REGEX, custom_id) is None):
             raise InvalidAPIUsage(
                 'Указано недопустимое имя для короткой ссылки',
